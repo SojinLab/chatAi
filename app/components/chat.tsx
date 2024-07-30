@@ -7,8 +7,16 @@ import { Box, Stack, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import CachedIcon from '@mui/icons-material/Cached';
+import type { ChatType } from "../ts/chat";
 
-const Chat = (props) => {
+interface ChatProps {
+    chat: ChatType[];
+    chatStop: boolean;
+    chatState: boolean;
+    onCease: (readChat: string) => void;
+    onReload: () => void;
+}
+const Chat = (props: ChatProps) => {
     const { chat, chatStop, chatState, onCease, onReload } = props;
     const boxShowRef = useRef(null);
 
@@ -27,14 +35,15 @@ const Chat = (props) => {
     }, [readChat, chatState]);
 
     // 角色样式
-    const Role = styled('h4')(({ theme }) => ({
-        fontFamily: theme.typography.subtitle2
-    }));
+    const Role = styled('h4')`
+    font-family: ${({ theme }) => theme.typography.subtitle2};
+    `;
+
     // 内容样式
-    const Content = styled('span')(({ theme }) => ({
-        color: theme.palette.text.secondary,
-        fontFamily: theme.typography.body2
-    }));
+    const Content = styled('span')`
+    color: ${({ theme }) => theme.palette.text.secondary};
+    font-family: ${({ theme }) => theme.typography.body2};
+    `
 
     // 停止生成样式
     const Cease = styled(StopCircleIcon)({

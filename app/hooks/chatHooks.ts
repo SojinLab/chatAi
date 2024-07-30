@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from "react";
+import type { ReadChat } from "../ts/chat";
 
-const useReadChat = (args) => {
+const useReadChat = (args: ReadChat) => {
     const { chat, chatStop, chatCease, chatState } = args;
     // 间隙读字
-    const [readChat, setReadChat] = useState('');
+    const [readChat, setReadChat] = useState<string>('');
     useEffect(() => {
         if (chatStop) { setReadChat('已取消生成'); return; }
         let index = 0;

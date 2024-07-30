@@ -1,4 +1,4 @@
-export const chatApi = (role, content) => {
+export const chatApi = (role: string, content: string) => {
     return fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {

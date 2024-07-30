@@ -1,7 +1,7 @@
 
 'use client'
 
-import React, { useEffect } from "react";
+import React, { KeyboardEventHandler } from "react";
 import { useState, useRef } from "react";
 
 import { Container, Box, Stack, TextField, IconButton, Snackbar } from '@mui/material';
@@ -12,6 +12,9 @@ import PendingIcon from '@mui/icons-material/Pending';
 import Chat from './components/chat';
 
 import { chatApi } from "./api/openAi";
+
+import type { ChatType, MessageState } from './ts/chat';
+import type { OpenAiRes } from "./ts/openAiApi";
 
 const ChatAi = () => {
 
@@ -26,10 +29,10 @@ const ChatAi = () => {
     }]
 
   // 聊天记录
-  const [chat, setChat] = useState(defaultChat);
+  const [chat, setChat] = useState<ChatType[]>(defaultChat);
 
   // 弹窗消息
-  const [messageState, setMessageState] = useState({
+  const [messageState, setMessageState] = useState<MessageState>({
     open: false,
     vertical: 'top',
     horizontal: 'center',
@@ -37,10 +40,10 @@ const ChatAi = () => {
   })
 
   // 聊天状态
-  const [chatState, setChatState] = useState(false);
+  const [chatState, setChatState] = useState<boolean>(false);
 
   // 取消生成
-  const [chatStop, setChatStop] = useState(false);
+  const [chatStop, setChatStop] = useState<boolean>(false);
 
   // 弹窗配置
   const { open, vertical, horizontal, message } = messageState;
@@ -50,7 +53,7 @@ const ChatAi = () => {
   const [curContent, setCurContent] = useState(null);
 
   // 弹窗消息
-  const handleClick = (newState) => {
+  const handleClick = (newState: Pick<MessageState, 'horizontal' | 'vertical'>) => {
     setMessageState({ ...newState, open: true, message: '无内容，请输入' });
     setTimeout(() => {
       setMessageState({ ...messageState, open: false });
@@ -58,7 +61,7 @@ const ChatAi = () => {
   };
 
   // 生成中
-  const chatIng = async (role, content, reload) => {
+  const chatIng = async (role: string, content: string, reload?: boolean) => {
     setChatState(true);
     setChatStop(false);
     setChat((prevChat) => {
@@ -72,10 +75,12 @@ const ChatAi = () => {
   }
 
   // 生成完成
-  const chatAPiFun = async (role, content) => {
+  const chatAPiFun = async (role: string, content: string) => {
     if (chat[chat.length - 1].chatStop === true) return;
-    const res = await chatApi(role, content);
+    const res: OpenAiRes = await chatApi(role, content);
+    console.log(res);
     if (res) {
+      console.log('')
       const resContent = res.choices ? res.choices[0].message.content : res.message;
       setChat((prevChat) => {
         if (!prevChat[prevChat.length - 1].chatStop) {
@@ -115,23 +120,12 @@ const ChatAi = () => {
   }
 
   // 监听回车键
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event: { key: string; preventDefault: () => void; }) => {
     if (event.key === 'Enter') {
       event.preventDefault();
       subMit();
     }
   };
-
-  // 角色样式
-  const Role = styled('h4')(({ theme }) => ({
-    fontFamily: theme.typography.subtitle2
-  }));
-
-  // 内容样式
-  const Content = styled('span')(({ theme }) => ({
-    color: theme.palette.text.secondary,
-    fontFamily: theme.typography.body2
-  }));
 
   // 发送图标样式
   const ArrowUpwardIconBg = styled(ArrowUpwardIcon)({
